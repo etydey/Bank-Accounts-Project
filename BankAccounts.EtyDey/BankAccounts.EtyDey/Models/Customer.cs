@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 
 namespace BankAccounts.EtyDey.Models
 {
@@ -9,8 +6,8 @@ namespace BankAccounts.EtyDey.Models
     {
         public string Name { get; set; }
         public string Id { get; set; }        
-        public string AccountNo { get; set; }
-        public double AccountBalance { get; set; }
+        
+        public List<Account> accounts { get; set; }
     }
 
 

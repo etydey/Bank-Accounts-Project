@@ -1,0 +1,30 @@
+  /* [Fact]
+            public void CaseUpdate()
+            {
+                // Arrange  
+                  var controller = new CustomersController();
+                  Customer cust = new Customer();
+                  cust.Name = "Stewie Griffin";
+                  cust.Id = "777";
+                  cust.AccountNo = "1234";
+                  cust.AccountBalance = 100;
+
+
+                  // Act  
+                  var expectedValue = 700;
+                  var newBalance = controller.AccountDeposit(cust.AccountBalance, 300, "USD");
+                  cust.AccountBalance = newBalance;
+                var controller = new CustomersController();
+                var updateStatus = controller.UpdateCustomerAccount("1234");
+               var expectedResult = true;
+
+                //Assert  
+                Assert.Equal(expectedResult, updateStatus);
+                _output.WriteLine("Update Status: {0}", updateStatus);
+
+                //Account account = controller.GetCustomerAccount("1234");
+
+                //Assert  
+               // Assert.NotNull(account);
+               // _output.WriteLine("Bank Account: {0}, Balance:{1}", account.AccountNo, account.AccountBalance.ToString("N", CultureInfo.InvariantCulture));
+            }*/

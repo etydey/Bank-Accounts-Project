@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using Xunit;
 using BankAccounts.EtyDey.Controllers;
 using Xunit.Abstractions;
-using BankAccounts.EtyDey.Models;
 using System.Globalization;
 
 namespace xUnitTests
@@ -16,8 +10,7 @@ namespace xUnitTests
     {
         public class Index
         {
-            //As we have hardcoded data, we need to use Account balance and return calculated value
-            //Otherwise we can use FindCustomer() Method and Update() Method
+            //Output Variable
             ITestOutputHelper _output;
 
             public Index(ITestOutputHelper output)
@@ -41,125 +34,106 @@ namespace xUnitTests
             [Fact]
             public void CaseOne()
             {
-                // Arrange  
+                //Arrange
                 var controller = new CustomersController();
-                Customer cust = new Customer();
-                cust.Name = "Stewie Griffin";
-                cust.Id = "777";
-                cust.AccountNo = "1234";
-                cust.AccountBalance = 100;
-                
-               
-                // Act  
-                var expectedValue = 700;
-                var newBalance = controller.AccountDeposit(cust.AccountBalance, 300, "USD");
-                cust.AccountBalance = newBalance;
+                var expectedValue = true;
+
+                //Act
+                bool deposit = controller.AccountDeposit("1234", 300, "USD");                
 
                 //Assert  
-                Assert.Equal(expectedValue, newBalance);
-                _output.WriteLine("Account Number: {0} Balance: ${1} CAD", cust.AccountNo, cust.AccountBalance.ToString("N", CultureInfo.InvariantCulture));
+                Assert.Equal(expectedValue, deposit);
+
+                //Act
+                var account = controller.GetCustomerAccount("1234");
+
+                //Assert  
+                Assert.NotNull(account);
+                 _output.WriteLine("Bank Account: {0}, Balance: ${1} CAD", account.AccountNo, account.AccountBalance.ToString("N", CultureInfo.InvariantCulture));
             }
 
-            [Fact]
-            public void CaseTwo()
-            {
+              [Fact]
+              public void CaseTwo()
+              {
                 // Arrange 
                 var controller = new CustomersController();
-                Customer cust = new Customer();
-                cust.Name = "Glenn Quagmire";
-                cust.Id = "504";
-                cust.AccountNo = "2001";
-                cust.AccountBalance = 35000;
-              
-                var BlAfterWithdraw1 = controller.AccountWithdraw(cust.AccountBalance, 5000, "mxn");
-                var BlAfterWithdraw2 = controller.AccountWithdraw(BlAfterWithdraw1, 12500, "usd");
-                var BlAfterDposit = controller.AccountDeposit(BlAfterWithdraw2, 300, "cad");
+                var expectedValue = true;
 
+                //Act
+                bool withdraw1 = controller.AccountWithdraw("2001", 5000, "MXN");
+                bool withdraw2 = controller.AccountWithdraw("2001", 12500, "USD");
+                bool deposit = controller.AccountDeposit("2001", 300, "CAD");
 
-                // Act  
-                var expectedValue = 9800;
-                cust.AccountBalance = BlAfterDposit;
 
                 //Assert  
-                Assert.Equal(expectedValue, cust.AccountBalance);
-                _output.WriteLine("Account Number: {0} Balance: ${1} CAD", cust.AccountNo, cust.AccountBalance.ToString("N", CultureInfo.InvariantCulture));
+                Assert.Equal(expectedValue, withdraw1);
+                Assert.Equal(expectedValue, withdraw2);
+                Assert.Equal(expectedValue, deposit);
+
+
+                //Act
+                var account = controller.GetCustomerAccount("2001");
+
+                //Assert  
+                Assert.NotNull(account);
+                _output.WriteLine("Bank Account: {0}, Balance: ${1} CAD", account.AccountNo, account.AccountBalance.ToString("N", CultureInfo.InvariantCulture));
+            }
+
+              [Fact]
+              public void CaseThree()
+              {
+                // Arrange  
+                var controller = new CustomersController();
+                var expectedValue = true;
+
+                //Act
+                bool withdraw = controller.AccountWithdraw("5500", 5000, "CAD");
+                bool transfer = controller.FundTransfer("1010", "5500", 7300, "CAD");
+                bool deposit = controller.AccountDeposit("1010", 13726, "MXN");
+
+
+                //Assert  
+                Assert.Equal(expectedValue, withdraw);
+                Assert.Equal(expectedValue, transfer);
+                Assert.Equal(expectedValue, deposit);
+
+                //Act
+                var account1010 = controller.GetCustomerAccount("1010");
+                var account5500 = controller.GetCustomerAccount("5500");
+
+                //Assert  
+                Assert.NotNull(account1010);
+                Assert.NotNull(account5500);
+                _output.WriteLine("Account Number: {0} Balance: ${1} CAD", account1010.AccountNo, account1010.AccountBalance.ToString("N", CultureInfo.InvariantCulture));
+                _output.WriteLine("Account Number: {0} Balance: ${1} CAD", account5500.AccountNo, account5500.AccountBalance.ToString("N", CultureInfo.InvariantCulture));
             }
 
             [Fact]
-            public void CaseThree()
-            {
-                //As we have hardcoded data, we need to use Account balance and return calculated value
-                //Otherwise we can use FindCustomer() Method and Update() Method
-                // Arrange  
+              public void CaseFour()
+              {
+                //Arrange
                 var controller = new CustomersController();
-                Customer Account1 = new Customer();
-                Account1.Name = "Joe Swanson";
-                Account1.Id = "002";
-                Account1.AccountNo = "1010";
-                Account1.AccountBalance = 7425;
+                var expectedValue = true;
 
-                Customer Account2 = new Customer();
-                Account2.Name = Account1.Name;
-                Account2.Id = Account1.Id;
-                Account2.AccountNo = "5500";
-                Account2.AccountBalance = 15000;
+                //Act
+                bool withdraw = controller.AccountWithdraw("0123", 70, "USD");
+                bool deposit = controller.AccountDeposit("0456", 23789, "USD");
+                bool transfer = controller.FundTransfer("0456", "0123", 23.75, "CAD");
 
-                var WithdrawMoneyFmAcc2 = controller.AccountWithdraw(Account2.AccountBalance, 5000, "CAD");
-                var transferMoneyFmAcc1 = controller.AccountWithdraw(Account1.AccountBalance, 7300, "CAD");
-                var transferMoneyToAcc2 = controller.AccountDeposit(WithdrawMoneyFmAcc2, 7300, "CAD");
-                var DepositMoneyToAcc1 = controller.AccountDeposit(transferMoneyFmAcc1, 13726, "MXN");
+                //Assert
+                Assert.Equal(expectedValue, withdraw);
+                Assert.Equal(expectedValue, deposit);
+                Assert.Equal(expectedValue, transfer);
 
-                // Act  
-                var expectedValueForAcc1 = 1497.60;
-                Account1.AccountBalance = DepositMoneyToAcc1;
+                //Act
+                var account0123 = controller.GetCustomerAccount("0123");
+                var account0456 = controller.GetCustomerAccount("0456");
 
-                var expectedValueForAcc2 = 17300;
-                Account2.AccountBalance = transferMoneyToAcc2;
-
-                //Assert  
-                Assert.Equal(expectedValueForAcc1, Account1.AccountBalance);
-                Assert.Equal(expectedValueForAcc2, Account2.AccountBalance);
-                _output.WriteLine("Account Number: {0} Balance: ${1} CAD", Account1.AccountNo, Account1.AccountBalance.ToString("N", CultureInfo.InvariantCulture));
-                _output.WriteLine("Account Number: {0} Balance: ${1} CAD", Account2.AccountNo, Account2.AccountBalance.ToString("N", CultureInfo.InvariantCulture));
-            }
-
-            [Fact]
-            public void CaseFour()
-            {
-                //As we have hardcoded data, we need to use Account balance and return calculated value
-                //Otherwise we can use FindCustomer() Method and Update()
-                // Arrange  
-                var controller = new CustomersController();
-                Customer Account1 = new Customer();
-                Account1.Name = "Peter Griffin";
-                Account1.Id = "123";
-                Account1.AccountNo = "0123";
-                Account1.AccountBalance = 150;
-
-                Customer Account2 = new Customer();
-                Account2.Name = "Lois Griffin";
-                Account2.Id = "456";
-                Account2.AccountNo = "0456";
-                Account2.AccountBalance = 65000;
-
-                var WithdrawMoneyFmAcc1 = controller.AccountWithdraw(Account1.AccountBalance, 70, "USD");
-                var DepositMoneyToAcc2 = controller.AccountDeposit(Account2.AccountBalance, 23789, "usd");
-                var transferMoneyFmAcc2 = controller.AccountWithdraw(DepositMoneyToAcc2, 23.75, "CAD");
-                var transferMoneyToAcc1 = controller.AccountDeposit(WithdrawMoneyFmAcc1, 23.75, "CAD");
-               
-
-                // Act  
-                var expectedValueForAcc1 = 33.75;
-                Account1.AccountBalance = transferMoneyToAcc1;
-
-                var expectedValueForAcc2 = 112554.25;
-                Account2.AccountBalance = transferMoneyFmAcc2;
-
-                //Assert  
-                Assert.Equal(expectedValueForAcc1, Account1.AccountBalance);
-                Assert.Equal(expectedValueForAcc2, Account2.AccountBalance);
-                _output.WriteLine("Account Number: {0} Balance: ${1} CAD", Account1.AccountNo, Account1.AccountBalance.ToString("N",CultureInfo.InvariantCulture));
-                _output.WriteLine("Account Number: {0} Balance: ${1} CAD", Account2.AccountNo, Account2.AccountBalance.ToString("N", CultureInfo.InvariantCulture));
+                //Assert
+                Assert.NotNull(account0123);
+                Assert.NotNull(account0456);
+                _output.WriteLine("Account Number: {0} Balance: ${1} CAD", account0123.AccountNo, account0123.AccountBalance.ToString("N", CultureInfo.InvariantCulture));
+                _output.WriteLine("Account Number: {0} Balance: ${1} CAD", account0456.AccountNo, account0456.AccountBalance.ToString("N", CultureInfo.InvariantCulture));
             }
         }
     }

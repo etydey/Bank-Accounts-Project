@@ -1,37 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-
+﻿
 namespace BankAccounts.EtyDey.Models
 {
     public class AccountOperation
     {
-        public static double Deposit(double Balance, double Amount, string Currency)
+        public static bool Deposit(string AccNo, double Amount, string Currency)
         {
-            //var customer = CustomerManager.FindCustomer(AccNo);
+            var account = CustomerManager.FindAccount(AccNo);
             var depositAmt = ExchangeRateManager.CurrencyConvert(Currency, Amount);
-            Balance = Balance + depositAmt;
-            return Balance;
+            account.AccountBalance = account.AccountBalance + depositAmt;
+            var update = CustomerManager.UpdateAccount(AccNo, account.AccountBalance);
+            return update;
         }
 
-        public static double Withdraw(double Balance, double Amount, string Currency)
+        public static bool Withdraw(string AccNo, double Amount, string Currency)
         {
-            //var customer = CustomerManager.FindCustomer(AccNo);
-           var withdrawAmt = ExchangeRateManager.CurrencyConvert(Currency, Amount);
-            Balance = Balance - withdrawAmt;
-            return Balance;
+            var account = CustomerManager.FindAccount(AccNo);
+            var depositAmt = ExchangeRateManager.CurrencyConvert(Currency, Amount);
+            account.AccountBalance = account.AccountBalance - depositAmt;
+            var update = CustomerManager.UpdateAccount(AccNo, account.AccountBalance);
+            return update;
         }
-
-       /* public static Customer Transfer(double BalanceFrom, double Balanceto, string AccNoTo, double Amount, string Currency)
-        {
-            //var customerFrom = CustomerManager.FindCustomer(AccNoFrom);
-            //var customerTo = CustomerManager.FindCustomer(AccNoTo);
-            var transferAmt = ExchangeRateManager.CurrencyConvert(Currency, Amount);
-            customerfrom.AccountBalance = customerfrom.AccountBalance + transferAmt;
-            customerTo.AccountBalance = customerTo.AccountBalance + transferAmt;
-            return customerTo;
-        }*/
 
     }
 }

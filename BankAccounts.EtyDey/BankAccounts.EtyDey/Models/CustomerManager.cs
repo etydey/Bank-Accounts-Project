@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Web;
 
 namespace BankAccounts.EtyDey.Models
 {
@@ -9,20 +9,84 @@ namespace BankAccounts.EtyDey.Models
     {
         public static IEnumerable<Customer> GetAllCustomers()
         {
-            var customers = new List<Customer>();
-            customers.Add(new Customer {Name = "Stewie Griffin", Id = "777", AccountNo = "1234", AccountBalance=100 });
-            customers.Add(new Customer {Name = "Glenn Quagmire", Id = "504", AccountNo = "2001", AccountBalance=35000 });
-            customers.Add(new Customer {Name = "Joe Swanson", Id = "002" , AccountNo = "1010", AccountBalance=7425 });
-            customers.Add(new Customer {Name = "Joe Swanson", Id = "002", AccountNo = "5500", AccountBalance=15000 });
-            customers.Add(new Customer { Name = "Peter Griffin", Id = "123", AccountNo = "0123", AccountBalance = 150 });
-            customers.Add(new Customer { Name = "Lois Griffin", Id = "456", AccountNo = "0456", AccountBalance = 65000 });
+            if(!File.Exists("CustomerDetails.json"))
+            {
+                string customerList = "[{\"Name\":\"Stewie Griffin\",\"Id\":\"777\",\"accounts\":[{\"AccountNo\":\"1234\",\"AccountBalance\":100.0}]},{\"Name\":\"Glenn Quagmire\",\"Id\":\"504\",\"accounts\":[{\"AccountNo\":\"2001\",\"AccountBalance\":35000}]},{\"Name\":\"Joe Swanson\",\"Id\":\"002\",\"accounts\":[{\"AccountNo\":\"1010\",\"AccountBalance\":7425},{\"AccountNo\":\"5500\",\"AccountBalance\":15000}]},{\"Name\":\"Peter Griffin\",\"Id\":\"123\",\"accounts\":[{\"AccountNo\":\"0123\",\"AccountBalance\":150}]},{\"Name\":\"Lois Griffin\",\"Id\":\"456\",\"accounts\":[{\"AccountNo\":\"0456\",\"AccountBalance\":65000}]}]";
+                File.WriteAllText("CustomerDetails.json", customerList);
+            }
+            string Datalist = File.ReadAllText("CustomerDetails.json");
+            var customers = JsonConvert.DeserializeObject<List<Customer>>(Datalist);
             return customers;
         }
 
-        public static Customer FindCustomer(string AccNo)
+        public static Account FindAccount(string AccNo)
+        { 
+            var account = new Account();
+            foreach(Customer cust in GetAllCustomers())
+            {
+                if(cust.accounts.SingleOrDefault(a => a.AccountNo == AccNo) != null)
+                {
+                    account = cust.accounts.SingleOrDefault(a => a.AccountNo == AccNo);
+                }
+            }
+            return account;
+        }
+
+        public static bool UpdateAccount(string AccNo, double Amount)
         {
-            var customer = GetAllCustomers().SingleOrDefault(c => c.AccountNo == AccNo);
-            return customer;
+            try
+            {
+                var customers = GetAllCustomers();
+                var account = new Account();
+                foreach (Customer cust in customers)
+                {
+                    if (cust.accounts.SingleOrDefault(a => a.AccountNo == AccNo) != null)
+                    {
+                        account = cust.accounts.SingleOrDefault(a => a.AccountNo == AccNo);
+                        account.AccountBalance = Amount;
+                    }
+                }
+
+                using (StreamWriter file = File.CreateText(@"CustomerDetails.json"))
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    serializer.Serialize(file, customers);
+                }
+                    return true;
+            }
+            catch
+            {
+                return false;
+            }
+            
+
+           /* try
+            {
+                //var jObject = JsonConvert.DeserializeObject<JArray>(Datalist).ToObject<List<JObject>>();
+                //var jObject = JObject.Parse(Datalist);
+                foreach (var item in array)
+                {
+                    //JArray accountList = (JArray)jObj["accounts"];
+                    foreach (var account in item["accounts"])
+                    {
+                        if(account["AccountNo"].Value.toString() == AccNo)
+                        {
+                            account["AccountBalance"] = 700;
+                        }
+                        
+                    }
+
+                    //item["accounts"] = accountList;
+
+                }
+                string output = JsonConvert.SerializeObject(array, Formatting.Indented);
+                File.WriteAllText("CustomerDetails.json", output);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }*/
         }
     }
 }

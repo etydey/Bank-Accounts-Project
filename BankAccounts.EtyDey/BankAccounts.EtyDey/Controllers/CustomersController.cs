@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using BankAccounts.EtyDey.Models;
-using System.Data;
 
 namespace BankAccounts.EtyDey.Controllers
 {
@@ -16,24 +11,39 @@ namespace BankAccounts.EtyDey.Controllers
             return View();
         }
 
-        //As we have hardcoded data, we need to use Account balance and return calculated value
-        //Otherwise we can use FindCustomer() Method and Update()
-        public double AccountDeposit(double AccBalance, double DpAmount, string Currency)
+        //Account Deposit
+        public bool AccountDeposit(string AccNo, double Amount, string Currency)
         {
-            var Balance = AccountOperation.Deposit(AccBalance, DpAmount, Currency);
-            return Balance;
+            var deposit = AccountOperation.Deposit(AccNo, Amount, Currency);
+            return deposit;
         }
 
-        public double AccountWithdraw(double AccBalance, double WdAmount, string Currency)
+        //Withdraw from Account
+        public bool AccountWithdraw(string AccNo, double Amount, string Currency)
         {
-            var Balance = AccountOperation.Withdraw(AccBalance, WdAmount, Currency);
-            return Balance;
+            var withdraw = AccountOperation.Withdraw(AccNo, Amount, Currency);
+            return withdraw;
         }
 
-        public void AccountTransfer(double BalanceFrom, double Balanceto, double WdAmount, double DpAmount, string Currency)
+        //Fund Transfer between Accounts
+        public bool FundTransfer(string accountFrom, string AccountTo, double Amount, string Currency)
         {
+            var withdraw = AccountOperation.Withdraw(accountFrom, Amount, Currency);
+            var deposit = AccountOperation.Deposit(AccountTo, Amount, Currency);
+            if(withdraw==true && deposit == true)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
 
-            //UpdateTransferFunds()
+        //Get Customer Account
+        public Account GetCustomerAccount(string AccNo)
+        {
+            return CustomerManager.FindAccount(AccNo);
         }
     }
 }
