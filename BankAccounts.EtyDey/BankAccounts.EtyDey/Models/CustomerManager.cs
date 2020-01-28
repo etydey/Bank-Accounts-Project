@@ -11,8 +11,16 @@ namespace BankAccounts.EtyDey.Models
         {
             if(!File.Exists("CustomerDetails.json"))
             {
-                string customerList = "[{\"Name\":\"Stewie Griffin\",\"Id\":\"777\",\"accounts\":[{\"AccountNo\":\"1234\",\"AccountBalance\":100.0}]},{\"Name\":\"Glenn Quagmire\",\"Id\":\"504\",\"accounts\":[{\"AccountNo\":\"2001\",\"AccountBalance\":35000}]},{\"Name\":\"Joe Swanson\",\"Id\":\"002\",\"accounts\":[{\"AccountNo\":\"1010\",\"AccountBalance\":7425},{\"AccountNo\":\"5500\",\"AccountBalance\":15000}]},{\"Name\":\"Peter Griffin\",\"Id\":\"123\",\"accounts\":[{\"AccountNo\":\"0123\",\"AccountBalance\":150}]},{\"Name\":\"Lois Griffin\",\"Id\":\"456\",\"accounts\":[{\"AccountNo\":\"0456\",\"AccountBalance\":65000}]}]";
-                File.WriteAllText("CustomerDetails.json", customerList);
+                List<Customer> customerList = new List<Customer>();
+                customerList.Add(new Customer { Name = "Stewie Griffin", Id = "777", accounts = new List<Account> { new Account { AccountNo = "1234", AccountBalance = 100 } } });
+                customerList.Add(new Customer { Name = "Glenn Quagmire", Id = "504", accounts = new List<Account> { new Account { AccountNo = "2001", AccountBalance = 35000 } } });
+                customerList.Add(new Customer { Name = "Joe Swanson", Id = "002", accounts = new List<Account> { new Account { AccountNo = "1010", AccountBalance = 7425 }, new Account { AccountNo = "5500", AccountBalance = 15000 } } });
+                customerList.Add(new Customer { Name = "Peter Griffin", Id = "123", accounts = new List<Account> { new Account { AccountNo = "0123", AccountBalance = 150 } } });
+                customerList.Add(new Customer { Name = "Lois Griffin", Id = "456", accounts = new List<Account> { new Account { AccountNo = "0456", AccountBalance = 65000 } } });
+
+                var jsonList = JsonConvert.SerializeObject(customerList);
+                //string customerList = "[{\"Name\":\"Stewie Griffin\",\"Id\":\"777\",\"accounts\":[{\"AccountNo\":\"1234\",\"AccountBalance\":100.0}]},{\"Name\":\"Glenn Quagmire\",\"Id\":\"504\",\"accounts\":[{\"AccountNo\":\"2001\",\"AccountBalance\":35000}]},{\"Name\":\"Joe Swanson\",\"Id\":\"002\",\"accounts\":[{\"AccountNo\":\"1010\",\"AccountBalance\":7425},{\"AccountNo\":\"5500\",\"AccountBalance\":15000}]},{\"Name\":\"Peter Griffin\",\"Id\":\"123\",\"accounts\":[{\"AccountNo\":\"0123\",\"AccountBalance\":150}]},{\"Name\":\"Lois Griffin\",\"Id\":\"456\",\"accounts\":[{\"AccountNo\":\"0456\",\"AccountBalance\":65000}]}]";
+                File.WriteAllText("CustomerDetails.json", jsonList);
             }
             string Datalist = File.ReadAllText("CustomerDetails.json");
             var customers = JsonConvert.DeserializeObject<List<Customer>>(Datalist);
